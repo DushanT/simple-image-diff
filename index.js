@@ -1,15 +1,10 @@
 // https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Image_types
 const fileTypes = [
-  "image/apng",
   "image/bmp",
-  "image/gif",
   "image/jpeg",
   "image/pjpeg",
   "image/png",
-  "image/svg+xml",
   "image/tiff",
-  "image/webp",
-  "image/x-icon"
 ];
 
 function validFileType(file) {
@@ -156,10 +151,18 @@ function compareCanvases(filename, originalFileName) {
 }
 
 const downloadCanvasImage = (canvas) => {
-  var link = document.createElement('a');
-  link.download = canvas.title;
-  link.href = canvas.toDataURL();
-  link.click();
+  // var link = document.createElement('a');
+  // link.download = canvas.title;
+  // link.href = canvas.toDataURL();
+  // link.click();
+
+  FileSaver.saveAs(canvas.toDataURL(), canvas.title);
+
+  // const zip = new JSZip();
+  // zip.file(canvas.title, canvas.toDataURL(), { base64: true});
+  // zip.generateAsync({ type: 'blob' }).then(function (content) {
+  //   FileSaver.saveAs(content, 'download.zip');
+  // });
 }
 
 const handleDownload = () => {
