@@ -7,50 +7,58 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+  <style>
+    main {
+      padding: 10px;
+      overflow: hidden;
+    }
+    canvas {
+      max-width: 100%;
+      box-shadow: 0px 0px 5px 0px #ccc;
+    }
+  </style>
 </head>
 
 <body>
   <main>
     <h1>Simple Image Diff</h1>
+    <p>Use same size images</p>
     <section>
-      <h2>First image</h2>
-      <canvas id="firstCanvas"></canvas>
-      <input id="file1" type="file" />
+      <article>
+        <h2>First image</h2>
+        <canvas id="firstCanvas"></canvas>
+        <input id="file1" type="file" />
+      </article>
+      <article>
+        <h2>Second image</h2>
+        <canvas id="secondCanvas"></canvas>
+        <input id="file2" type="file" />
+      </article>
     </section>
     <section>
-      <h2>Second image</h2>
-      <canvas id="secondCanvas"></canvas>
-      <input id="file2" type="file" />
+      <article>
+        <h2>Result</h2>
+        <canvas id="resultCanvas"></canvas>
+      </article>
+      <article>
+        <label>
+          Treshold
+          <input id="treshold" type="range" value="4" min="0" max="100" step="1" />
+        </label>
+        <span id="tresholdvalue">4</span>%
+      </article>
     </section>
-    <section>
-      <h2>Result</h2>
-      <canvas id="resultCanvas"></canvas>
-    </section>
-    <label>
-      Treshold
-      <input id="treshold" type="range" value="4" min="0" max="100" step="1" />
-    </label>
-    <section>
-      <span id="tresholdvalue">4</span>%
-    </section>
-    <section>
-      <button id="download">Download result</button>
-    </section>
+    <button id="download">Download result</button>
   </main>
   <script>
-    firstCanvas.style.boxShadow = '0px 0px 5px 0px #ccc';
-    firstCanvas.style.background = 'black';
     const firstCtx = firstCanvas.getContext("2d");
-
-    secondCanvas.style.boxShadow = '0px 0px 5px 0px #ccc';
-    secondCanvas.style.background = 'black';
     const secondCtx = secondCanvas.getContext("2d");
-
-    resultCanvas.style.boxShadow = '0px 0px 5px 0px #ccc';
     const resultCtx = resultCanvas.getContext("2d");
 
     const image = document.createElement('img');
+    image.src = './first.png';
     const image2 = document.createElement('img');
+    image2.src = './second.png';
 
     const handleChange = (image) => async (e) => {
       const [file] = e.target.files;
@@ -109,8 +117,9 @@
     function compareImages(firstData, secondData) {
       const { data } = firstData;
       const { data: data2 } = secondData;
-      
+
       const useFirstData = data.length > data2.length;
+      console.log(data.length, data2.length);
       const resultData = useFirstData ? firstData : secondData;
       const len = useFirstData ? data.length : data2.length;
 
@@ -134,8 +143,6 @@
       }
       return true;
     }
-
-    document.body.appendChild(canvas);
 
   </script>
 </body>
