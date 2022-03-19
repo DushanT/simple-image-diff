@@ -6,25 +6,20 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
 </head>
 
 <body>
   <h1>Upload files</h1>
+  <h2>First image</h2>
   <div>
-    <label>
-      File 1
-      <input id="file1" type="file" />
-    </label>
+    <canvas id="firstCanvas"></canvas>
+    <input id="file1" type="file" />
   </div>
+  <h2>Second image</h2>
   <div>
-    <label>
-      File 2
-      <input id="file2" type="file" />
-    </label>
-  </div>
-  <h2>Compare these files</h2>
-  <div>
-    <canvas id="comparationCanvas"></canvas>
+    <canvas id="secondCanvas"></canvas>
+    <input id="file2" type="file" />
   </div>
   <h2>Result</h2>
   <div>
@@ -34,14 +29,19 @@
     <button id="copyresult">Download result</button>
   </div>
   <script>
-    const comparationCtx = comparationCanvas.getContext("2d");
+    firstCanvas.style.boxShadow = '0px 0px 5px 0px #ccc';
+    firstCanvas.style.background = 'black';
+    const firstCtx = firstCanvas.getContext("2d");
+    
+    secondCanvas.style.boxShadow = '0px 0px 5px 0px #ccc';
+    secondCanvas.style.background = 'black';
+    const secondCtx = secondCanvas.getContext("2d");
+
+    resultCanvas.style.boxShadow = '0px 0px 5px 0px #ccc';
     const resultCtx = resultCanvas.getContext("2d");
 
     const image = document.createElement('img');
-    image.src = './first.png';
-
     const image2 = document.createElement('img');
-    image2.src = './second.png';
 
     const handleChange = (image) => async (e) => {
       const [file] = e.target.files;
@@ -65,19 +65,22 @@
     copyresult.addEventListener('click', handleCopy);
 
     const draw = () => {
-      comparationCanvas.width=Math.max(image.width, image2.width);
-      comparationCanvas.height=image.height + image2.height;
+      firstCanvas.width = Math.max(image.width, image2.width);
+      firstCanvas.height = image.height;
+      firstCtx.clearRect(0, 0, firstCanvas.width, firstCanvas.height);
+      firstCtx.drawImage(image, 0, 0);
+      
+      secondCanvas.width = firstCanvas.width;
+      secondCanvas.height = firstCanvas.height;
+      secondCtx.clearRect(0, 0, firstCanvas.width, firstCanvas.height);
+      secondCtx.drawImage(image2, 0, 0);
 
-      comparationCtx.clearRect(0, 0, comparationCanvas.width, comparationCanvas.height);
-      comparationCtx.drawImage(image, 0, 0);
-      comparationCtx.drawImage(image2, 0, image.height);
-
-      const imageData = comparationCtx.getImageData(0, 0, image.width, image.height);
-      const imageData2 = comparationCtx.getImageData(0, image.height, image.width, image.height)
+      const imageData = firstCtx.getImageData(0, 0, image.width, image.height);
+      const imageData2 = secondCtx.getImageData(0, 0, image.width, image.height)
+      
       const newImageData = compareImages(imageData, imageData2);
-
-      resultCanvas.width=Math.max(image.width, image2.width);
-      resultCanvas.height=image.height;
+      resultCanvas.width = Math.max(image.width, image2.width);
+      resultCanvas.height = image.height;
 
       resultCtx.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
       resultCtx.putImageData(newImageData, 0, 0);
