@@ -153,7 +153,7 @@ function compareCanvases(filename, originalFileName) {
 
 const downloadCanvasImage = (canvas) => {
   canvas.toBlob(blob => {
-    saveAs(blob, `${canvas.title}-diff`);
+    saveAs(blob, canvas.title.replace('.', '-diff.'));
   })
 }
 
@@ -162,7 +162,7 @@ const handleDownload = () => {
   const zip = new JSZip();
   resultCanvases.forEach(canvas => {
     const url = canvas.toDataURL();
-    zip.file(`${canvas.title}-diff`, url.substr(url.indexOf(',') + 1), { base64: true });
+    zip.file(canvas.title.replace('.', '-diff.'), url.substr(url.indexOf(',') + 1), { base64: true });
   });
   zip.generateAsync({ type: 'blob' }).then(function (content) {
     saveAs(content, 'download.zip');
