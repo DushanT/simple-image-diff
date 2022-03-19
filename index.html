@@ -6,15 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <style>
-    body {
-      padding: 0;
-      margin: 0;
-    }
-  </style>
 </head>
 
 <body>
+  <h1>Upload files</h1>
   <div>
     <label>
       File 1
@@ -27,14 +22,16 @@
       <input id="file2" type="file" />
     </label>
   </div>
+  <h2>Compare these files</h2>
   <div>
     <canvas id="comparationCanvas"></canvas>
   </div>
+  <h2>Result</h2>
   <div>
     <canvas id="resultCanvas"></canvas>
   </div>
   <div>
-    <button id="copyresult">copy result</button>
+    <button id="copyresult">Download result</button>
   </div>
   <script>
     const comparationCtx = comparationCanvas.getContext("2d");
