@@ -10,29 +10,38 @@
 </head>
 
 <body>
-  <h1>Upload files</h1>
-  <h2>First image</h2>
-  <div>
-    <canvas id="firstCanvas"></canvas>
-    <input id="file1" type="file" />
-  </div>
-  <h2>Second image</h2>
-  <div>
-    <canvas id="secondCanvas"></canvas>
-    <input id="file2" type="file" />
-  </div>
-  <h2>Result</h2>
-  <div>
-    <canvas id="resultCanvas"></canvas>
-  </div>
-  <div>
-    <button id="copyresult">Download result</button>
-  </div>
+  <main>
+    <h1>Simple Image Diff</h1>
+    <section>
+      <h2>First image</h2>
+      <canvas id="firstCanvas"></canvas>
+      <input id="file1" type="file" />
+    </section>
+    <section>
+      <h2>Second image</h2>
+      <canvas id="secondCanvas"></canvas>
+      <input id="file2" type="file" />
+    </section>
+    <section>
+      <h2>Result</h2>
+      <canvas id="resultCanvas"></canvas>
+    </section>
+    <label>
+      Treshold
+      <input id="treshold" type="range" value="4" min="0" max="100" step="1" />
+    </label>
+    <section>
+      <span id="tresholdvalue">4</span>%
+    </section>
+    <section>
+      <button id="download">Download result</button>
+    </section>
+  </main>
   <script>
     firstCanvas.style.boxShadow = '0px 0px 5px 0px #ccc';
     firstCanvas.style.background = 'black';
     const firstCtx = firstCanvas.getContext("2d");
-    
+
     secondCanvas.style.boxShadow = '0px 0px 5px 0px #ccc';
     secondCanvas.style.background = 'black';
     const secondCtx = secondCanvas.getContext("2d");
@@ -57,27 +66,35 @@
     file1.addEventListener('change', handleChange(image));
     file2.addEventListener('change', handleChange(image2));
 
-    const handleCopy = () => {
-      const image = resultCanvas.toDataURL("image/png").replace("image/png", "image/octet-stream");  // here is the most important part because if you dont replace you will get a DOM 18 exception.
-
-      window.location.href = image; // it will save locally
+    const handleTresholdChange = (e) => {
+      tresholdvalue.innerText = e.target.value;
+      if (image.src && image2.src) {
+        draw();
+      }
     }
-    copyresult.addEventListener('click', handleCopy);
+    treshold.addEventListener('input', handleTresholdChange)
+
+    const handleDownload = () => {
+      const image = resultCanvas.toDataURL("image/png").replace("image/png", "image/octet-stream");  // here is the most important part because if you dont replace you will get a DOM 18 exception.
+      window.location.href = image;
+    }
+
+    download.addEventListener('click', handleDownload);
 
     const draw = () => {
       firstCanvas.width = Math.max(image.width, image2.width);
       firstCanvas.height = image.height;
       firstCtx.clearRect(0, 0, firstCanvas.width, firstCanvas.height);
       firstCtx.drawImage(image, 0, 0);
-      
-      secondCanvas.width = firstCanvas.width;
-      secondCanvas.height = firstCanvas.height;
+
+      secondCanvas.width = image2.width;
+      secondCanvas.height = image2.height;
       secondCtx.clearRect(0, 0, firstCanvas.width, firstCanvas.height);
       secondCtx.drawImage(image2, 0, 0);
 
       const imageData = firstCtx.getImageData(0, 0, image.width, image.height);
       const imageData2 = secondCtx.getImageData(0, 0, image.width, image.height)
-      
+
       const newImageData = compareImages(imageData, imageData2);
       resultCanvas.width = Math.max(image.width, image2.width);
       resultCanvas.height = image.height;
@@ -89,21 +106,26 @@
     image.onload = draw;
     image2.onload = draw;
 
-
     function compareImages(firstData, secondData) {
       const { data } = firstData;
       const { data: data2 } = secondData;
-      for (let i = 0; i < data.length; i += 4) {
+      
+      const useFirstData = data.length > data2.length;
+      const resultData = useFirstData ? firstData : secondData;
+      const len = useFirstData ? data.length : data2.length;
+
+      for (let i = 0; i < len; i += 4) {
         const [r, g, b, a] = data.slice(i, i + 4);
         const [r2, g2, b2, a2] = data2.slice(i, i + 4);
-        if (!isSimilar([r, g, b, a], [r2, g2, b2, a2], 10)) {
-          firstData.data[i] = 255;
-          firstData.data[i + 1] = 0;
-          firstData.data[i + 2] = 0;
-          firstData.data[i + 3] = 255;
+        const tresholdPercent = treshold.value / 100;
+        if (!isSimilar([r, g, b, a], [r2, g2, b2, a2], 255 * (tresholdPercent ?? 0.04))) {
+          resultData.data[i] = 255;
+          resultData.data[i + 1] = 0;
+          resultData.data[i + 2] = 0;
+          resultData.data[i + 3] = 255;
         }
       }
-      return firstData;
+      return resultData;
     }
 
     function isSimilar(firstArray, secondArray, treshold) {
