@@ -150,24 +150,23 @@ function compareCanvases(filename, originalFileName) {
   }
 }
 
+
 const downloadCanvasImage = (canvas) => {
-  // var link = document.createElement('a');
-  // link.download = canvas.title;
-  // link.href = canvas.toDataURL();
-  // link.click();
-
-  FileSaver.saveAs(canvas.toDataURL(), canvas.title);
-
-  // const zip = new JSZip();
-  // zip.file(canvas.title, canvas.toDataURL(), { base64: true});
-  // zip.generateAsync({ type: 'blob' }).then(function (content) {
-  //   FileSaver.saveAs(content, 'download.zip');
-  // });
+  canvas.toBlob(blob => {
+    saveAs(blob, `${canvas.title}-diff`);
+  })
 }
 
 const handleDownload = () => {
   const resultCanvases = [...document.querySelectorAll('.canvas-result')];
-  resultCanvases.forEach(downloadCanvasImage);
+  const zip = new JSZip();
+  resultCanvases.forEach(canvas => {
+    const url = canvas.toDataURL();
+    zip.file(`${canvas.title}-diff`, url.substr(url.indexOf(',') + 1), { base64: true });
+  });
+  zip.generateAsync({ type: 'blob' }).then(function (content) {
+    saveAs(content, 'download.zip');
+  });
 }
 
 const handleTresholdChange = (e) => {
