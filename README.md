@@ -8,4 +8,4 @@ Usage
 `npx lite-server`
 
 ## Netlify
-[Side](https://simple-image-diff.netlify.app/)
+[Demo](https://simple-image-diff.netlify.app/)
