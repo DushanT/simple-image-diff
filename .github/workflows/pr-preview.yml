@@ -12,7 +12,7 @@ jobs:
         with:
           surge_token: ${{ secrets.SURGE_TOKEN }}
           github_token: ${{ secrets.GIT_TOKEN }}
-          dist: .
+          dist: ./
           build: |
             npm install
             npm run build
